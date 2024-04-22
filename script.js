@@ -1,3 +1,4 @@
+
 const options = {
   method: "GET",
   headers: {
@@ -6,35 +7,75 @@ const options = {
   },
 };
 
-const getWeather = (latitude, longitude) => {
-  fetch(
-    `https://weather-by-api-ninjas.p.rapidapi.com/v1/weather?lat=${latitude}&lon=${longitude}`,
-    options
-  )
-    .then((response) => response.json())
-    .then((response) => {
-      console.log(response);
-     // Update HTML elements with weather information
-      cityName.innerHTML = "Weather in " + response.city_name; // Update city name
-      temp.innerHTML = response.temp;
-      wind_speed.innerHTML = response.wind_speed;
-      humidity.innerHTML = response.humidity;
-      cloud_pct.innerHTML = response.cloud_pct;
-    })
-    .catch((err) => console.error(err));
+const getWeather = async (city) => {
+  try {
+    const response = await fetch(
+      `https://weather-by-api-ninjas.p.rapidapi.com/v1/weather?city=${city}`,
+      options
+      );
+      
+       if (!response.ok) {
+         // If response is not successful, throw an error
+         throw new Error(`HTTP error! Status: ${response.status}`);
+       }
+
+    const weatherData = await response.json();
+    console.log(weatherData);
+
+    // Update HTML elements with weather information
+    cityName.innerHTML = city;
+    temp.innerHTML = weatherData.temp;
+    wind_speed.innerHTML = weatherData.wind_speed;
+    humidity.innerHTML = weatherData.humidity;
+    cloud_pct.innerHTML = weatherData.cloud_pct;
+  } catch (err) {
+      console.error(err);
+      if (err.message.includes("Status: 400")) {
+        alert("City name is incorrect. Please enter a valid city name.");
+      } else {
+        // Handle other errors
+        alert(
+          "An error occurred while fetching weather data. Please try again later."
+        );
+      }
+  }
 };
 
-// Function to get current location
+
+const getWeather1 = async (latitude,longitude) => {
+  try {
+    const response = await fetch(
+      `https://weather-by-api-ninjas.p.rapidapi.com/v1/weather?lat=${latitude}&lon=${longitude}`,
+      options
+    );
+    const weatherData = await response.json();
+    console.log(weatherData);
+
+    // Update HTML elements with weather information
+    cityName.innerHTML = "your city";
+    temp.innerHTML = weatherData.temp;
+    wind_speed.innerHTML = weatherData.wind_speed;
+    humidity.innerHTML = weatherData.humidity;
+    cloud_pct.innerHTML = weatherData.cloud_pct;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+
+//Function to get current location
 const getCurrentLocation = () => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
-        getWeather(latitude, longitude);
+        getWeather1(latitude, longitude);
       },
       (error) => {
-        console.error(error);
+          console.error(error);
+          alert("Allow location access")
       }
     );
   } else {
@@ -44,9 +85,10 @@ const getCurrentLocation = () => {
 
 // Event listener for button click to get weather for current location
 btn.addEventListener("click", (e) => {
-  e.preventDefault();
-  getCurrentLocation();
+    e.preventDefault();
+    const citiname = city.value;
+  getWeather(citiname);
 });
 
 // Call getCurrentLocation() initially to get weather for current location
-getCurrentLocation();
+ getCurrentLocation();
