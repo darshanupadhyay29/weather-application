@@ -75,7 +75,7 @@ const getCurrentLocation = () => {
       },
       (error) => {
           console.error(error);
-         // alert("Allow location access")
+      
       }
     );
   } else {
